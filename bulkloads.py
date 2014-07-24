@@ -73,17 +73,20 @@ loads =[]
 ithLoad = 0
 startIndex = 0
 endIndex = len(text)
+
+f = open('loads.txt', 'w')
 # Loop over the number of occurences of 'view', which signals
 # the beginning of a new load.
 while(ithLoad < nLoads):
 	loadIndex = text.index('view', startIndex, endIndex)
-	endLoadIndex= text.index('view', loadIndex+1) 
+	endLoadIndex = text.index('view', loadIndex+1) 
 	loads.append(text[loadIndex+1:endLoadIndex])
 	startIndex = endLoadIndex+1
+	thisLoad = filter(None, loads[ithLoad])
 	ithLoad+=1
-	
+	f.write(", ".join(thisLoad)+'\n')
 
-
+f.close()
 #f = open('loads.txt', 'w')
 #for line in text:
 #	f.write(line+'\n')
