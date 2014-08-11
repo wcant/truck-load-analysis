@@ -1,3 +1,6 @@
 *.pyc
 *.py.swo
 *.py.swp
+coordinate-cmd-line-sample/
+loadweasel_data/
+*.txt
