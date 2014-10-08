@@ -68,7 +68,7 @@ br.submit()
 text = h.handle(br.response().read()).splitlines()
 
 # Get initial conditions load retrieval loop
-nLoads = text.count('view')
+nLoads = text.count('view')//2
 loads =[]
 ithLoad = 0
 startIndex = 0
@@ -77,19 +77,28 @@ endIndex = len(text)
 f = open('loads.txt', 'w')
 # Loop over the number of occurences of 'view', which signals
 # the beginning of a new load.
-while(ithLoad < nLoads):
+while(ithLoad <= nLoads):
 	loadIndex = text.index('view', startIndex, endIndex)
-	endLoadIndex = text.index('view', loadIndex+1) 
-	loads.append(text[loadIndex+1:endLoadIndex])
+	try:
+		endLoadIndex = text.index('view', loadIndex+1) 
+	except ValueError:
+		endLoadIndex = text.index('Offline Chat | Send E-mail', loadIndex+1)
+		loads.append(text[loadIndex+1:endLoadIndex+1])
+		thisLoad = filter(None, loads[ithLoad])
+		f.write(", ".join(thisLoad)+'\n')
+		break
+	loads.append(text[loadIndex+1:endLoadIndex+1])
 	startIndex = endLoadIndex+1
 	thisLoad = filter(None, loads[ithLoad])
 	ithLoad+=1
 	f.write(", ".join(thisLoad)+'\n')
 
 f.close()
-#f = open('loads.txt', 'w')
-#for line in text:
-#	f.write(line+'\n')
+
+
+f = open('loads.txt', 'w')
+for line in text:
+	f.write(line+'\n')
 
 
 
