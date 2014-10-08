@@ -2,6 +2,7 @@ import cookielib
 import mechanize
 import sys
 import html2text
+import json
 
 # Username and password(respectively) must be passed as arguments
 # from the command line.
@@ -65,40 +66,40 @@ br.open(req)
 
 br.select_form('CFForm_4')
 br.submit()
-text = h.handle(br.response().read()).splitlines()
+raw_text = h.handle(br.response().read()).splitlines()
+text = ''.join(raw_text)
 
 # Get initial conditions load retrieval loop
 nLoads = text.count('view')//2
-loads =[]
+loads = {}
 ithLoad = 0
 startIndex = 0
 endIndex = len(text)
 
-f = open('loads.txt', 'w')
+fieldNames = ["origin_city", "origin_state", "destination_city", 
+							"destination_state", "start_date", "end_date", "loads", 
+							"rate", "equip", "miles", "added", "posted_by"]
+
 # Loop over the number of occurences of 'view', which signals
 # the beginning of a new load.
 while(ithLoad <= nLoads):
-	loadIndex = text.index('view', startIndex, endIndex)
+	startLoadIndex = text.index('view', startIndex, endIndex)
 	try:
-		endLoadIndex = text.index('view', loadIndex+1) 
+		endLoadIndex = text.index('view', startLoadIndex+1) 
 	except ValueError:
-		endLoadIndex = text.index('Offline Chat | Send E-mail', loadIndex+1)
-		loads.append(text[loadIndex+1:endLoadIndex+1])
-		thisLoad = filter(None, loads[ithLoad])
-		f.write(", ".join(thisLoad)+'\n')
+		endLoadIndex = text.index('Offline Chat | Send E-mail', startLoadIndex+1)
+		fieldValues = text[startLoadIndex:endLoadIndex].split('|')[1:13]
 		break
-	loads.append(text[loadIndex+1:endLoadIndex+1])
+	#start at 1 to ignore the 'view' string, end at 13 to ignore excess
+	fieldValues = text[startLoadIndex:endLoadIndex].split('|')[1:13]
+	loads[ithLoad] = dict(zip(fieldNames, fieldValues))
 	startIndex = endLoadIndex+1
-	thisLoad = filter(None, loads[ithLoad])
 	ithLoad+=1
-	f.write(", ".join(thisLoad)+'\n')
-
-f.close()
 
 
-f = open('loads.txt', 'w')
-for line in text:
-	f.write(line+'\n')
-
+#with open('loads.txt', 'w') as f:
+#	f.write(','.join(fieldNames))
+#	for line in text:
+#		f.write(line+'\n')
 
 
