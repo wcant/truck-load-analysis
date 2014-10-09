@@ -2,10 +2,17 @@ import cookielib
 import mechanize
 import sys
 import html2text
-import json
-
+import urllib, json, csv
 # Username and password(respectively) must be passed as arguments
 # from the command line.
+
+#geocoding function from google api
+def geocode(addr):
+    url = "http://maps.googleapis.com/maps/api/geocode/json?address=%s&sensor=false" %   (urllib.quote(addr.replace(' ', '+')))
+    data = urllib.urlopen(url).read()
+    info = json.loads(data).get("results")[0].get("geometry").get("location")  
+    return info
+
 UNAME = str(sys.argv[1])
 PASS = str(sys.argv[2])
 
@@ -93,9 +100,11 @@ while(ithLoad <= nLoads):
 	#start at 1 to ignore the 'view' string, end at 13 to ignore excess
 	fieldValues = text[startLoadIndex:endLoadIndex].split('|')[1:13]
 	loads[ithLoad] = dict(zip(fieldNames, fieldValues))
-	startIndex = endLoadIndex+1
+	startIndex = endLoadIndex
 	ithLoad+=1
 
+with open('data.json', 'wb') as fp:
+	json.dump(loads, fp)
 
 #with open('loads.txt', 'w') as f:
 #	f.write(','.join(fieldNames))
