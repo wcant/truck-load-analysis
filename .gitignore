@@ -5,4 +5,4 @@ coordinate-cmd-line-sample/
 loadweasel_data/
 *.txt
 .Python
-.gitignore
+*.json
