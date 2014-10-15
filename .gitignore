@@ -6,3 +6,4 @@ loadweasel_data/
 *.txt
 .Python
 *.json
+*.p12
