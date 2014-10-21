@@ -37,6 +37,10 @@ link.send_keys(Keys.RETURN)
 #script, but then infinite loop is possible
 form = driver.find_element_by_id('CFForm_4')
 dropdown = form.find_element_by_id('equip_origin_state')
+1/0
+availableKeys = dropdown.text.split('\n')
+#need to encapsulate extraction of data from html so that I can loop
+#over each territory in availableKeys
 dropdown.send_keys('ALL')
 dropdown.submit()
 
