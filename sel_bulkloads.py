@@ -6,7 +6,8 @@ import html2text
 """ This entire program assumes each load does not contain the string
 		'view' anywhere other than at the beginning of each load listing.
 """
-
+#error catching variables
+errorStates = []
 URL0 = "http://www.bulkloadsnow.com"
 #UNAME = str(sys.argv[1])
 #PASS = str(sys.argv[2])
@@ -30,28 +31,36 @@ password.send_keys(PASS)
 submit.send_keys(Keys.RETURN)
 
 #LOADS page
-link = driver.find_element_by_link_text('LOADS')
-link.send_keys(Keys.RETURN)
-#The page appears to occasionally not load the "ALL STATES" option
-#so I might add in a try/except here to avoid having to rerun the entire
-#script, but then infinite loop is possible
-form = driver.find_element_by_id('CFForm_4')
-dropdown = form.find_element_by_id('equip_origin_state')
-1/0
-availableKeys = dropdown.text.split('\n')
-#need to encapsulate extraction of data from html so that I can loop
-#over each territory in availableKeys
-dropdown.send_keys('ALL')
-dropdown.submit()
+def getAvailableStates():
+		link = driver.find_element_by_link_text('LOADS')
+		link.send_keys(Keys.RETURN)
+		form = driver.find_element_by_id('CFForm_4')
+		dropdown = form.find_element_by_id('equip_origin_state')
+		availableStates = dropdown.text.split('\n')
+		return availableStates
 
-rawHtml = driver.page_source
-rawText = h.handle(rawHtml).splitlines()
-text = ''.join(rawText)
+text = {}
+availableStates = getAvailableStates()
+for state in availableStates:
+		print(state)
+		try:
+				link = driver.find_element_by_link_text('LOADS')
+				link.send_keys(Keys.RETURN)
+				form = driver.find_element_by_id('CFForm_4')
+				dropdown = form.find_element_by_id('equip_origin_state')
+				dropdown.send_keys(state)
+				dropdown.submit()
+				rawHtml = driver.page_source
+				rawText = h.handle(rawHtml).splitlines()
+				text[state] = ''.join(rawText)
+		except:
+				errorStates.append(state)
+				continue
 
 fieldNames = ["origin_city", "origin_state", "destination_city", 
 							"destination_state", "start_date", "end_date", "loads", 
 							"rate", "equip", "miles", "added", "posted_by"]
-
+1/0
 # Get initial conditions load retrieval loop
 loads = {}
 ithLoad = 0
